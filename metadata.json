@@ -1,0 +1,6 @@
+{
+  "name": "Peptonix Ad Videos - Work Log",
+  "description": "Premium work log and payment tracker for Peptonix Ad Videos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

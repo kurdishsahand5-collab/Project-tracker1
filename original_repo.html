@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peptonix Ad Videos — Work Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --card: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #c8f542;
+    --accent2: #f5a623;
+    --text: #f0f0f0;
+    --muted: #6b6b6b;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 24px 16px 80px;
+  }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(20px, 5vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .people-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .person-tag {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .person-tag .role { color: var(--accent2); }
+  .person-tag .name { color: var(--text); font-weight: 500; }
+
+  .stats-row {
+    max-width: 860px;
+    margin: 0 auto 28px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.yellow { color: var(--accent); }
+  .stat-value.orange { color: var(--accent2); }
+  .stat-value.red { color: var(--red); }
+
+  /* FORM */
+  .form-section {
+    max-width: 860px;
+    margin: 0 auto 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+
+  .form-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  input, select, textarea {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 10px 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 65px; }
+  select option { background: var(--card); }
+
+  .btn-add {
+    margin-top: 14px;
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-add:hover { opacity: 0.88; }
+  .btn-add:active { transform: scale(0.98); }
+  .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* EDIT MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    color: var(--accent);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .btn-save {
+    flex: 1;
+    padding: 11px;
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-save:hover { opacity: 0.88; }
+
+  .btn-cancel {
+    padding: 11px 20px;
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .btn-cancel:hover { color: var(--text); }
+
+  /* LIST */
+  .list-section {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .list-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tab {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.2s;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: #0d0d0d;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    animation: slideIn 0.3s ease;
+    transition: border-color 0.2s;
+  }
+
+  .project-card:hover { border-color: #3a3a3a; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-left { flex: 1; min-width: 0; }
+
+  .card-num {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .card-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    font-size: 9px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge.paid { background: rgba(200,245,66,0.12); color: var(--accent); border: 1px solid rgba(200,245,66,0.25); }
+  .badge.unpaid { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+
+  .card-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .card-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .card-notes {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.6;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn-sm {
+    padding: 6px 13px;
+    border-radius: 7px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.15s;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
+  .btn-sm.pay { border-color: rgba(200,245,66,0.25); color: var(--accent); }
+  .btn-sm.pay:hover { background: rgba(200,245,66,0.08); }
+  .btn-sm.edit { border-color: rgba(96,165,250,0.25); color: var(--blue); }
+  .btn-sm.edit:hover { background: rgba(96,165,250,0.08); }
+
+  .total-bar {
+    max-width: 860px;
+    margin: 20px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .total-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .total-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--red);
+  }
+
+  .saved-note {
+    max-width: 860px;
+    margin: 8px auto 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .card-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="dot"></div>
+    <h1>Peptonix <span>Ad Videos</span> — Work Log</h1>
+  </div>
+  <div class="people-row">
+    <div class="person-tag">
+      <span class="role">Creator</span>
+      <span>→</span>
+      <span class="name">Sahand Najmaldeen</span>
+    </div>
+    <div class="person-tag" style="color:#444">//</div>
+    <div class="person-tag">
+      <span class="role">Client</span>
+      <span>→</span>
+      <span class="name">Karbin Yasin</span>
+    </div>
+    <div class="person-tag" style="color:#444">//</div>
+    <div class="person-tag">
+      <span class="role">Rate</span>
+      <span>→</span>
+      <span class="name">10,000 IQD / video</span>
+    </div>
+  </div>
+</header>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-label">Videos Done</div>
+    <div class="stat-value yellow" id="stat-total">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total Earned</div>
+    <div class="stat-value orange" id="stat-total-earned">0 IQD</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Paid</div>
+    <div class="stat-value green" id="stat-paid">0 IQD</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Owed to You</div>
+    <div class="stat-value red" id="stat-owed">0 IQD</div>
+  </div>
+</div>
+
+<div class="form-section">
+  <div class="form-title">+ Log a Completed Ad Video</div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Video / Project Title *</label>
+      <input type="text" id="inp-name" placeholder="e.g. Peptonix Summer Ad #3">
+    </div>
+    <div class="form-group">
+      <label>Date Completed *</label>
+      <input type="date" id="inp-date">
+    </div>
+    <div class="form-group">
+      <label>Amount (IQD) *</label>
+      <input type="number" id="inp-amount" placeholder="10000">
+    </div>
+    <div class="form-group">
+      <label>Video Type</label>
+      <select id="inp-type">
+        <option value="Advertising Video">Advertising Video</option>
+        <option value="Product Promo">Product Promo</option>
+        <option value="Social Media Ad">Social Media Ad</option>
+        <option value="Story Ad">Story Ad</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group full">
+      <label>Notes (optional)</label>
+      <textarea id="inp-notes" placeholder="e.g. 30-second product highlight reel for Instagram..."></textarea>
+    </div>
+  </div>
+  <button class="btn-add" id="btn-add-main" onclick="addProject()">✓ Save This Video</button>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">✏ Edit Project</div>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Video / Project Title *</label>
+        <input type="text" id="edit-name">
+      </div>
+      <div class="form-group">
+        <label>Date Completed *</label>
+        <input type="date" id="edit-date">
+      </div>
+      <div class="form-group">
+        <label>Amount (IQD) *</label>
+        <input type="number" id="edit-amount">
+      </div>
+      <div class="form-group">
+        <label>Video Type</label>
+        <select id="edit-type">
+          <option value="Advertising Video">Advertising Video</option>
+          <option value="Product Promo">Product Promo</option>
+          <option value="Social Media Ad">Social Media Ad</option>
+          <option value="Story Ad">Story Ad</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Notes</label>
+        <textarea id="edit-notes"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveEdit()">✓ Save Changes</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="list-section">
+  <div class="list-header">
+    <div class="list-title">Video History</div>
+    <div class="filter-tabs">
+      <button class="tab active" onclick="setFilter('all', this)">All</button>
+      <button class="tab" onclick="setFilter('unpaid', this)">Unpaid</button>
+      <button class="tab" onclick="setFilter('paid', this)">Paid</button>
+    </div>
+  </div>
+  <div id="project-list"><div class="loading-state">Loading...</div></div>
+</div>
+
+<div class="total-bar">
+  <div>
+    <div class="total-label">💰 Total Karbin Owes Sahand (Unpaid)</div>
+  </div>
+  <div class="total-amount" id="total-unpaid">0 IQD</div>
+</div>
+
+<div class="saved-note" id="saved-note">💾 All data saved automatically</div>
+
+<script>
+  const STORAGE_KEY = 'peptonix_worklog_v1';
+  let projects = [];
+  let currentFilter = 'all';
+
+  // ── Storage helpers ──────────────────────────────────────────────
+  async function loadData() {
+    try {
+      const result = await window.storage.get(STORAGE_KEY);
+      if (result && result.value) {
+        projects = JSON.parse(result.value);
+      }
+    } catch (e) {
+      projects = [];
+    }
+    render();
+  }
+
+  async function saveData() {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(projects));
+      const note = document.getElementById('saved-note');
+      note.textContent = '✓ Saved at ' + new Date().toLocaleTimeString();
+    } catch (e) {
+      const note = document.getElementById('saved-note');
+      note.textContent = '⚠ Save failed — ' + e.message;
+    }
+  }
+
+  // ── Filter ───────────────────────────────────────────────────────
+  function setFilter(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  // ── Add ──────────────────────────────────────────────────────────
+  async function addProject() {
+    const name   = document.getElementById('inp-name').value.trim();
+    const type   = document.getElementById('inp-type').value;
+    const date   = document.getElementById('inp-date').value;
+    const amount = parseFloat(document.getElementById('inp-amount').value);
+    const notes  = document.getElementById('inp-notes').value.trim();
+
+    if (!name)              { alert('Please enter a video/project title.'); return; }
+    if (!date)              { alert('Please enter the completion date.'); return; }
+    if (!amount || isNaN(amount)) { alert('Please enter a valid amount.'); return; }
+
+    const btn = document.getElementById('btn-add-main');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const project = {
+      id: Date.now(),
+      name, type, date, amount, notes,
+      paid: false,
+      createdAt: new Date().toISOString()
+    };
+
+    projects.unshift(project);
+    await saveData();
+    render();
+
+    document.getElementById('inp-name').value   = '';
+    document.getElementById('inp-notes').value  = '';
+    document.getElementById('inp-amount').value = '10000';
+    document.getElementById('inp-date').value   = new Date().toISOString().split('T')[0];
+
+    btn.disabled = false;
+    btn.textContent = '✓ Save This Video';
+  }
+
+  // ── Edit modal ───────────────────────────────────────────────────
+  function openEditModal(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('edit-id').value     = p.id;
+    document.getElementById('edit-name').value   = p.name;
+    document.getElementById('edit-date').value   = p.date;
+    document.getElementById('edit-amount').value = p.amount;
+    document.getElementById('edit-type').value   = p.type;
+    document.getElementById('edit-notes').value  = p.notes || '';
+    document.getElementById('edit-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+  }
+
+  async function saveEdit() {
+    const id     = parseInt(document.getElementById('edit-id').value);
+    const p      = projects.find(x => x.id === id);
+    if (!p) return;
+
+    const name   = document.getElementById('edit-name').value.trim();
+    const date   = document.getElementById('edit-date').value;
+    const amount = parseFloat(document.getElementById('edit-amount').value);
+
+    if (!name)   { alert('Please enter a title.'); return; }
+    if (!date)   { alert('Please enter a date.'); return; }
+    if (!amount || isNaN(amount)) { alert('Please enter a valid amount.'); return; }
+
+    p.name   = name;
+    p.date   = date;
+    p.amount = amount;
+    p.type   = document.getElementById('edit-type').value;
+    p.notes  = document.getElementById('edit-notes').value.trim();
+
+    await saveData();
+    render();
+    closeModal();
+  }
+
+  // ── Paid toggle ──────────────────────────────────────────────────
+  async function markPaid(id) {
+    const p = projects.find(x => x.id === id);
+    if (p) { p.paid = !p.paid; await saveData(); render(); }
+  }
+
+  // ── Delete ───────────────────────────────────────────────────────
+  async function deleteProject(id) {
+    const p = projects.find(x => x.id === id);
+    if (!p) return;
+    if (!confirm(`Delete "${p.name}"?\nThis cannot be undone.`)) return;
+    projects = projects.filter(x => x.id !== id);
+    await saveData();
+    render();
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y, m, day] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${parseInt(day)} ${months[parseInt(m)-1]} ${y}`;
+  }
+
+  function formatMoney(n) {
+    return Number(n).toLocaleString('en-US') + ' IQD';
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // ── Render ───────────────────────────────────────────────────────
+  function render() {
+    const filtered = projects.filter(p => {
+      if (currentFilter === 'paid')   return p.paid;
+      if (currentFilter === 'unpaid') return !p.paid;
+      return true;
+    });
+
+    const totalEarned = projects.reduce((s, p) => s + p.amount, 0);
+    const totalPaid   = projects.filter(p =>  p.paid).reduce((s, p) => s + p.amount, 0);
+    const totalOwed   = projects.filter(p => !p.paid).reduce((s, p) => s + p.amount, 0);
+
+    document.getElementById('stat-total').textContent        = projects.length;
+    document.getElementById('stat-total-earned').textContent = formatMoney(totalEarned);
+    document.getElementById('stat-paid').textContent         = formatMoney(totalPaid);
+    document.getElementById('stat-owed').textContent         = formatMoney(totalOwed);
+    document.getElementById('total-unpaid').textContent      = formatMoney(totalOwed);
+
+    const list = document.getElementById('project-list');
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state">No videos logged yet.<br>Add your first completed ad video above.</div>`;
+      return;
+    }
+
+    // Number them in original order (oldest = #1)
+    const sorted = [...projects].reverse();
+
+    list.innerHTML = filtered.map(p => {
+      const num = sorted.findIndex(x => x.id === p.id) + 1;
+      return `
+        <div class="project-card">
+          <div class="card-top">
+            <div class="card-left">
+              <div class="card-num">VIDEO #${num} &nbsp;·&nbsp; ${escHtml(p.type)}</div>
+              <div class="card-name">${escHtml(p.name)}</div>
+            </div>
+            <div class="card-badges">
+              <span class="badge ${p.paid ? 'paid' : 'unpaid'}">${p.paid ? 'Paid ✓' : 'Unpaid'}</span>
+            </div>
+          </div>
+          <div class="card-meta">📅 Completed: ${formatDate(p.date)}</div>
+          <div class="card-amount">${formatMoney(p.amount)}</div>
+          ${p.notes ? `<div class="card-notes">${escHtml(p.notes)}</div>` : ''}
+          <div class="card-actions">
+            <button class="btn-sm edit"   onclick="openEditModal(${p.id})">✏ Edit</button>
+            <button class="btn-sm pay"    onclick="markPaid(${p.id})">${p.paid ? '↩ Mark Unpaid' : '✓ Mark as Paid'}</button>
+            <button class="btn-sm danger" onclick="deleteProject(${p.id})">✕ Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Close modal on overlay click ─────────────────────────────────
+  document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ── Defaults ─────────────────────────────────────────────────────
+  document.getElementById('inp-date').value   = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-amount').value = '10000';
+
+  loadData();
+</script>
+</body>
+</html>
